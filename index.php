@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<?php 
+echo '<!DOCTYPE html>
 <html>
 <head>
 	<title>About</title>
@@ -7,12 +8,13 @@
     <ul>
         <li><a  href="index.php">Home</a></a></li>
         <li><a  href="about.php">About</a></a></li>
-    </ul>
-<?php
+    </ul>';
+
 include_once('Database.php');
 include_once('Visitorcounter.php');
 
 $counter = new Visitorcounter();
+$counter->run_counter('visitors');
 echo $counter->get_ip();
 
 
@@ -30,6 +32,4 @@ echo 'Total visitors of this page this week: '.$counter->visit_thisweek($counter
 echo "<br>";
 echo 'Total visitors of this page today: '.$counter->visit_today($counter->get_pageUrl()); //display today visitor visit of this page
 echo "<br>";
-?>
-</body>
-</html>
+?></body></html>
