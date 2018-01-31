@@ -684,6 +684,11 @@ function getBrowser($user_agent="") {
 		# code...
 		if($page != ''){
 
+			//if (is_string($counter) || is_bool(($counter))) {
+				# code...
+				$counter = (int)$counter;
+			//}
+
 			$sql = sprintf("SELECT * from page_visits where page = '%s' and date_visited = '%s'",urlencode($page),$date);
 			$query = $this->query($sql);
 			if($result = $this->result($query))
