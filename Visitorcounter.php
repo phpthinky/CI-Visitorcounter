@@ -18,6 +18,92 @@ class Visitorcounter
 *
 *
 */
+public function setcookie($value='')
+{
+	# code...
+
+			$cookie_name = "user";
+			$cookie_value = "John Doe";
+			
+	if(!isset($_COOKIE[$cookie_name])) {
+
+			setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/"); // 86400 = 1 day
+			return false;
+
+		} else {
+			return true;
+		}
+
+}
+ public function run($value='')
+        {
+        	if($this->check_bots($this->userAgent())){
+        		// do nothing
+        	}else{
+        		if ($this->setcookie()) {
+        		// do nothing
+        		}else{
+
+		            $makeDirY = $this->makeDir(BASEPATH.'../counter/visit/'.date('Y'));
+		            $makeDirM = $this->makeDir(BASEPATH.'../counter/visit/'.date('Y').'/'.date('m'));
+		            $path = BASEPATH.'../counter/visit/'.date('Y').'/'.date('m');
+		            $file = fopen($path.'/'.date('Y-m-d').'.txt', 'a') or die("Can't create file");
+		            $ip = $this->getRealIpAddr();
+		            $date = date('Y-m-d h:i a');
+		            $country =  $this->getCountry($ip);
+		            $countrycode =  $this->getCountrycode($ip);
+		            $city =  $this->getCity($ip);
+
+		            fwrite($file, "$ip~$date~$country~$countrycode~$city"."\n");
+		            fclose($file);
+        		}
+
+
+        	}
+            # code...
+  }
+
+  public function read($date='',$y=0,$m=0)
+  {
+  	# code...
+  	if (isset($date) && $y > 0 && $m > 0) {
+  		# code...
+
+  		$path = BASEPATH.'../counter/visit/'.$y.'/'.$m;
+  		$filename = $path.'/'.$date.'.txt';
+  		if(file_exists($filename)){
+  			$fileinfo = fopen($filename, 'r');
+				$data = array();
+				$i=0;
+				while (!feof($fileinfo)) {
+		        	$line = fgets($fileinfo);
+		        	$data[$i] = $line;
+		        	$i++;
+		    		}
+		    	fclose($fileinfo);
+		    	return $data;
+
+  		}
+  		return false;
+
+
+		exit();
+  	}
+  		$path = BASEPATH.'../counter/visit/'.date('Y').'/'.date('m');
+		$file = fopen($path.'/'.date('Y-m-d').'.txt', "r") or die("Unable to open file!");
+		$data = array();
+		$i=0;
+		while (!feof($file)) {
+        	$line = fgets($file);
+        	$data[$i] = $line;
+        	$i++;
+    		}
+    	fclose($file);
+    	return $data;
+
+
+  }
+
 function getRealIpAddr()
 {
     if (!empty($_SERVER['HTTP_CLIENT_IP']))   //check ip from share internet
@@ -38,9 +124,12 @@ function getRealIpAddr()
  public function getCountry($ip='')
  {
  	# code...
- 	global $ipreader;
+	$ipreader = new Reader(BASEPATH.'../counter/GeoLite2-City/GeoLite2-City.mmdb');
+
  	$ip = !empty($ip) ? $ip : $this->getRealIpAddr();
-	if($ip !== '127.0.0.1'){
+
+	
+	if($ip !== '127.0.0.1' && $ip !== "::1"){
 	$record = $ipreader->city($ip);
 	return $record->country->name; // 'United States'
 
@@ -49,17 +138,20 @@ function getRealIpAddr()
 	return 'Invalid IP address: '.$ip;
 
  	}
+ 	
  }
 
 
  public function getCountrycode($ip='')
  {
  	# code...
- 	global $ipreader;
+
+	$ipreader = new Reader(BASEPATH.'../counter/GeoLite2-City/GeoLite2-City.mmdb');
+
  	$ip = !empty($ip) ? $ip : $this->getRealIpAddr();
-	if($ip !== '127.0.0.1'){
+	if($ip !== '127.0.0.1' && $ip !== "::1"){
 	$record = $ipreader->city($ip);
-	return $record->country->code; // 'United States'
+	return $record->country->isoCode; // 'United States'
 
  	}else{
  		
@@ -71,9 +163,10 @@ function getRealIpAddr()
  public function getCity($ip='')
  {
  	# code...
- 	global $ipreader;
+
+	$ipreader = new Reader(BASEPATH.'../counter/GeoLite2-City/GeoLite2-City.mmdb');
  	$ip = !empty($ip) ? $ip : $this->getRealIpAddr();
-	if($ip !== '127.0.0.1'){
+	if($ip !== '127.0.0.1' && $ip !== "::1"){
 	$record = $ipreader->city($ip);
 	return $record->city->name; // 'United States'
 
@@ -84,6 +177,12 @@ function getRealIpAddr()
  	}
  }
 
+
+public function userAgent($value='')
+{
+	# code...
+	return $_SERVER['HTTP_USER_AGENT'];
+}
 // Get user device information
 function getOS($user_agent='') { 
 
@@ -173,4 +272,9 @@ function getBrowser($user_agent="") {
 		return true;
 	}else {return false;}
 	}
+
+	public function makeDir($path)
+		{
+		     return is_dir($path) || mkdir($path);
+		}
 }
