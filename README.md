@@ -1,4 +1,5 @@
-# PageViewCounter
+# Visitorcounter
+Visitorcounter is a class y for codeigniter
 to use this class you must install first the geoip2 via composer
 
 add this into your composer.json file
