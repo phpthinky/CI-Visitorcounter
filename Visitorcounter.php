@@ -6,7 +6,7 @@
 
 require 'geoip-reader/vendor/autoload.php';
 use GeoIp2\Database\Reader;
-$ipreader = new Reader($_SERVER['DOCUMENT_ROOT'].'/counter/GeoLite2-City/GeoLite2-City.mmdb');
+$ipreader = new Reader(BASEPATH.'../counter/GeoLite2-City/GeoLite2-City.mmdb');
 
 class Visitorcounter
 {
