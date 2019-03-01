@@ -89,18 +89,24 @@ public function setcookie($value='')
 
 		exit();
   	}
-  		$path = BASEPATH.'../counter/visit/'.date('Y').'/'.date('m');
-		$file = fopen($path.'/'.date('Y-m-d').'.txt', "r") or die("Unable to open file!");
-		$data = array();
-		$i=0;
-		while (!feof($file)) {
-        	$line = fgets($file);
-        	$data[$i] = $line;
-        	$i++;
-    		}
-    	fclose($file);
-    	return $data;
+  		
 
+  	  	$path = BASEPATH.'../counter/visit/'.date('Y').'/'.date('m');
+  		$filename = $path.'/'.date('Y-m-d').'.txt';
+  		if(file_exists($filename)){
+  			$fileinfo = fopen($filename, 'r');
+				$data = array();
+				$i=0;
+				while (!feof($fileinfo)) {
+		        	$line = fgets($fileinfo);
+		        	$data[$i] = $line;
+		        	$i++;
+		    		}
+		    	fclose($fileinfo);
+		    	return $data;
+
+  		}
+  		return false;
 
   }
 
