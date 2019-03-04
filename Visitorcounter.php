@@ -110,6 +110,79 @@ public function setcookie($value='')
 
   }
 
+  public function getcurrentdata($date='',$y=0,$m=0)
+  {
+    # code...       
+            if($data = $this->read($date,$y,$m)){
+                $info = array();
+                $i=0;
+                $country  = '';
+                $counter = 0;
+                $ip = '';
+                foreach ($data as $keys) {
+                    # code...
+
+                $data_array = explode('~', $keys);
+
+                    if(count($data_array) > 1){
+                       $ip = $data_array[0];
+                       $date = $data_array[1];
+                       $country = $data_array[2];
+                       $countrycode = $data_array[3];
+
+                        $count = $counter++;
+                            $info[$i] = array('country'=>$countrycode,'counter'=>$count);
+                           $i++;                                         
+
+                    }
+
+
+                }
+                $newdata = array();
+                $i=0;
+                $j=0;
+                asort($info);
+                $country = '';
+                foreach ($info as $key) {
+                    # code...
+                    if ($i == 0) {
+                        # code...
+
+                        $country = $key['country'];
+                        $newdata[$j] = array('country'=>$country,'counter'=>1);
+                        $i++;
+                        $j++;
+
+                    }else{
+
+                        if ($country == $key['country']) {
+                            # code...
+
+                                foreach ($newdata as &$k) {
+                                    # code...
+                                    if($k['country'] == $country){
+                                        
+                                    $k['counter'] = $k['counter']+1;
+                                    }
+                                }
+                            $i++;
+                        }else{
+                        $country = $key['country'];
+
+                        $newdata[$j] = array('country'=>$country,'counter'=>1);
+                            $i++;
+                            $j++;
+                        }
+                    }
+
+                }
+
+              return $newdata;
+
+            }else{
+              return false;
+            }
+  }
 function getRealIpAddr()
 {
     if (!empty($_SERVER['HTTP_CLIENT_IP']))   //check ip from share internet
