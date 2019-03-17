@@ -2,7 +2,7 @@
 Visitorcounter is a class y for codeigniter
 to use this class you must install first the geoip2 via composer
 
-add this into your composer.json file
+1. Download GeoLite2 Database reader : add this into your composer.json file
 ```
 {
 "require":
@@ -12,9 +12,10 @@ add this into your composer.json file
 }
 ```
 or install via composer
-
-composer require geoip2/geoip2:~2.0<br/>
-
+```
+php composer require geoip2/geoip2:~2.0<br/>
+```
+2. Download MaxMind GeoLite2 Free Downloadable Databases:  https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz
 To use this class add this line to your controller
 
 ```
