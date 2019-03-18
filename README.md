@@ -41,7 +41,7 @@ $this->visitorcounter->read();
 ::2~2019-03-04 02:02 pm~Invalid IP address: ::1~PH~Invalid IP address: ::1 
 ::1~2019-03-04 02:60 pm~Invalid IP address: ::1~JP~Invalid IP address: ::1 
 //Getcurrentdata by array
-// getcurrentdata($date,$y,$m)
+// getcurrentdata($date,$year,$month)
             if($data = $this->visitorcounter->getcurrentdata()){
                var_dump($data);
             }
