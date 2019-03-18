@@ -4,11 +4,11 @@
  * 
  */
 
+//date_default_timezone_set('Asia/Manila');
 require 'geoip-reader/vendor/autoload.php';
 use GeoIp2\Database\Reader;
-$ipreader = new Reader(BASEPATH.'../counter/GeoLite2-City/GeoLite2-City.mmdb');
 
-class Visitorcounter
+class Webvisitors
 {
 	
 
@@ -24,10 +24,13 @@ public function setcookie($value='')
 
 			$cookie_name = "user";
 			$cookie_value = "John Doe";
-			
+
+     unset($_COOKIE[$cookie_name]);
+
+
 	if(!isset($_COOKIE[$cookie_name])) {
 
-			setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/"); // 86400 = 1 day
+			setcookie($cookie_name, $cookie_value, time() + (86400), "/"); // 86400 = 1 day
 			return false;
 
 		} else {
@@ -48,8 +51,9 @@ public function setcookie($value='')
 		            $makeDirM = $this->makeDir(BASEPATH.'../counter/visit/'.date('Y').'/'.date('m'));
 		            $path = BASEPATH.'../counter/visit/'.date('Y').'/'.date('m');
 		            $file = fopen($path.'/'.date('Y-m-d').'.txt', 'a') or die("Can't create file");
-		            $ip = $this->getRealIpAddr();
+		            $ip = $this->getIp();
 		            $date = date('Y-m-d h:i a');
+                $time = date('h:i a');
 		            $country =  $this->getCountry($ip);
 		            $countrycode =  $this->getCountrycode($ip);
 		            $city =  $this->getCity($ip);
@@ -86,12 +90,8 @@ public function setcookie($value='')
   		}
   		return false;
 
-
-		exit();
   	}
-  		
-
-  	  	$path = BASEPATH.'../counter/visit/'.date('Y').'/'.date('m');
+  	  		$path = BASEPATH.'../counter/visit/'.date('Y').'/'.date('m');
   		$filename = $path.'/'.date('Y-m-d').'.txt';
   		if(file_exists($filename)){
   			$fileinfo = fopen($filename, 'r');
@@ -108,8 +108,9 @@ public function setcookie($value='')
   		}
   		return false;
 
-  }
 
+
+  }
   public function getcurrentdata($date='',$y=0,$m=0)
   {
     # code...       
@@ -131,7 +132,7 @@ public function setcookie($value='')
                        $countrycode = $data_array[3];
 
                         $count = $counter++;
-                            $info[$i] = array('country'=>$countrycode,'counter'=>$count);
+                            $info[$i] = array('country'=>$countrycode,'date'=>$date);
                            $i++;                                         
 
                     }
@@ -149,7 +150,7 @@ public function setcookie($value='')
                         # code...
 
                         $country = $key['country'];
-                        $newdata[$j] = array('country'=>$country,'counter'=>1);
+                        $newdata[$j] = array('country'=>$country,'counter'=>1,'date_of_visit'=>$key['date']);
                         $i++;
                         $j++;
 
@@ -169,7 +170,7 @@ public function setcookie($value='')
                         }else{
                         $country = $key['country'];
 
-                        $newdata[$j] = array('country'=>$country,'counter'=>1);
+                        $newdata[$j] = array('country'=>$country,'counter'=>1,'date_of_visit'=>$key['date']);
                             $i++;
                             $j++;
                         }
@@ -183,7 +184,8 @@ public function setcookie($value='')
               return false;
             }
   }
-function getRealIpAddr()
+
+function getIp()
 {
     if (!empty($_SERVER['HTTP_CLIENT_IP']))   //check ip from share internet
     {
@@ -199,61 +201,96 @@ function getRealIpAddr()
     }
     return $ip;
 }
+public function is_validIp($ip='')
+{
+  # code...
+  if($ip !== '127.0.0.1' && $ip !== "::1")
+    return true;
+  
+  return false;
+}
 
  public function getCountry($ip='')
  {
- 	# code...
-	$ipreader = new Reader(BASEPATH.'../counter/GeoLite2-City/GeoLite2-City.mmdb');
 
- 	$ip = !empty($ip) ? $ip : $this->getRealIpAddr();
 
-	
-	if($ip !== '127.0.0.1' && $ip !== "::1"){
-	$record = $ipreader->city($ip);
-	return $record->country->name; // 'United States'
+  if ($this->dbpath()) {
+    # code...
+      $ipreader = new Reader($this->dbpath());
 
- 	}else{
- 		
-	return 'Invalid IP address: '.$ip;
+      $ip = !empty($ip) ? $ip : $this->getIp();
+      if($this->is_validIp($ip)){
+      $record = $ipreader->city($ip);
+      return $record->country->isoCode; // 'United States'
 
- 	}
+      }else{
+        
+      return 'Invalid IP address: '.$ip;
+
+      }
+     }else{
+      return NULL;
+     }
  	
  }
-
+public function dbpath($value='')
+{
+  # code...
+   $geodbpath = BASEPATH.'../counter/GeoLite2-City/GeoLite2-City.mmdb';
+   if (file_exists($geodbpath)) {
+     # code...
+    return $geodbpath;
+   }
+    return false;
+  }
 
  public function getCountrycode($ip='')
  {
  	# code...
+ 
+  if ($this->dbpath()) {
+    # code...
+      $ipreader = new Reader($this->dbpath());
 
-	$ipreader = new Reader(BASEPATH.'../counter/GeoLite2-City/GeoLite2-City.mmdb');
+      $ip = !empty($ip) ? $ip : $this->getIp();
+      if($this->is_validIp($ip)){
+      $record = $ipreader->city($ip);
+      return $record->country->isoCode; // 'United States'
 
- 	$ip = !empty($ip) ? $ip : $this->getRealIpAddr();
-	if($ip !== '127.0.0.1' && $ip !== "::1"){
-	$record = $ipreader->city($ip);
-	return $record->country->isoCode; // 'United States'
+      }else{
+        
+      return 'Invalid IP address: '.$ip;
 
- 	}else{
- 		
-	return 'Invalid IP address: '.$ip;
+      }
+     }else{
+      return NULL;
+     }
 
- 	}
- }
+  }
+
 
  public function getCity($ip='')
  {
  	# code...
 
-	$ipreader = new Reader(BASEPATH.'../counter/GeoLite2-City/GeoLite2-City.mmdb');
- 	$ip = !empty($ip) ? $ip : $this->getRealIpAddr();
-	if($ip !== '127.0.0.1' && $ip !== "::1"){
-	$record = $ipreader->city($ip);
-	return $record->city->name; // 'United States'
+  if ($this->dbpath()) {
+    # code...
+      $ipreader = new Reader($this->dbpath());
 
- 	}else{
- 		
-	return 'Invalid IP address: '.$ip;
+      $ip = !empty($ip) ? $ip : $this->getIp();
+      if($ip !== '127.0.0.1' && $ip !== "::1"){
+      $record = $ipreader->city($ip);
+    return $record->city->name; // 'United States'
 
- 	}
+      }else{
+        
+      return 'Invalid IP address: '.$ip;
+
+      }
+     }else{
+      return NULL;
+     }
+
  }
 
 
